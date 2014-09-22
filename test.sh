@@ -62,4 +62,8 @@ done
 echo "* Removing the mu-plugin"
 rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
-echo '* Done!';
+# Comparing logs folders
+LOG_DIFF=$( diff -rq $TMP/before $TMP/after )
+
+[[ $LOG_DIFF ]] && echo 'Different log entries detected, upgrade needs manual handling.' && echo $LOG_DIFF && exit 1;
+echo 'Identical log entries found, upgrade was successful.' && exit 0;
