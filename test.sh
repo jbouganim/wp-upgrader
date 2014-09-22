@@ -68,8 +68,10 @@ rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 LOG_DIFF=$( diff -rq $TMP/before $TMP/after )
 
 if [ ! $LOG_DIFF ]; then
+	# Restore DB snapshot
 	wp db reset --yes
 	wp db import $TMP/before.sql
+	# @todo how to restore files ?
 	echo 'Different log entries detected, upgrade needs manual handling.'
 	echo $LOG_DIFF
 	exit 1
