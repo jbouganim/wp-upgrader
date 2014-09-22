@@ -65,5 +65,13 @@ rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 # Comparing logs folders
 LOG_DIFF=$( diff -rq $TMP/before $TMP/after )
 
-[[ $LOG_DIFF ]] && echo 'Different log entries detected, upgrade needs manual handling.' && echo $LOG_DIFF && exit 1;
-echo 'Identical log entries found, upgrade was successful.' && exit 0;
+if [ ! $LOG_DIFF ]; then
+	wp db reset --yes
+	wp db import $TMP/before.sql
+	echo 'Different log entries detected, upgrade needs manual handling.'
+	echo $LOG_DIFF
+	exit 1
+else
+	echo 'Identical log entries found, upgrade was successful.'
+	exit 0
+fi
