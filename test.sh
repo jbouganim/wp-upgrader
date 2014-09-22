@@ -58,10 +58,25 @@ for url in $URLS; do
 	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
 done
 
+# UPGRADE ROUTING
+# ---------------
+
 echo "* Updating WordPress"
 wp core update --version=3.9.2
-echo "* Updating all plugins"
-wp plugin update --all
+echo "* Getting list of plugins with available updates"
+wp plugin update --all --dry-run >/dev/null 2>&1 # so we have update availability information
+PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available | sed 1d )
+printf "*- %s\n" ${PLUGINS[@]}
+
+echo "* Updating plugins"
+for plugin in $PLUGINS; do
+	if [ -a "$WP_CONTENT_DIR/plugins/$plugin/.git" ]; then
+		echo "** Ignoring $plugin since it is a submodule"
+	else
+		echo "** Updating $plugin"
+		wp plugin update $plugin
+	fi
+done
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
