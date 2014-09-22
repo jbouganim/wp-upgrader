@@ -74,6 +74,7 @@ wp plugin update --all --dry-run >/dev/null 2>&1 # so we have update availabilit
 PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available | sed 1d )
 printf "*- %s\n" ${PLUGINS[@]}
 
+# @todo should probably make sure those plugins are under a git repo as well
 echo "* Updating plugins"
 for plugin in $PLUGINS; do
 	if [ -a "$WP_CONTENT_DIR/plugins/$plugin/.git" ]; then
