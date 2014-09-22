@@ -49,6 +49,8 @@ done
 
 echo "* Updating WordPress"
 wp core update --version=3.9.2
+echo "* Updating all plugins"
+wp plugin update --all
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
