@@ -6,9 +6,13 @@ PROJECT_ROOT=`pwd`
 HASH=`md5sum <<< "$PROJECT_ROOT" | awk '{ print $1 }'`
 TMP="/tmp/wp-upgrader/$HASH"
 USERAGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko, L_y_n_x) Chrome/21.0.1180.79 Safari/537.1"
+SITEROOT=`wp eval 'echo realpath(ABSPATH);'`
 SITEURL=`wp option get siteurl`
 WP_CONTENT_DIR=`wp eval 'echo WP_CONTENT_DIR;'`
+
 echo "* Site URL detected as $SITEURL"
+echo "* Site Root detected as $SITEROOT"
+echo "* WP_CONTENT detected as $WP_CONTENT_DIR"
 
 # Create our tmp directory
 echo "* Creating temporary directory $TMP"
@@ -18,6 +22,13 @@ mkdir -p $TMP/{before,after}
 # Backup DB
 echo "* Exporting DB"
 wp db export $TMP/before.sql
+
+# Switching to a new branch
+echo "* Switching to 'upgrade' branch"
+cd $SITEROOT
+git checkout -f # clean any unsaved changes
+git checkout master # checkout the master branch
+git checkout -b upgrade || echo 'Could not create upgrade branch'; exit 1; # create a new upgrade branch, and exit if failed
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
