@@ -17,7 +17,7 @@ mkdir -p $TMP/{before,after}
 
 # Backup DB
 echo "* Exporting DB"
-#wp db export $TMP/before.sql
+wp db export $TMP/before.sql
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
@@ -48,7 +48,7 @@ for url in $URLS; do
 done
 
 echo "* Updating WordPress"
-#wp core update --version=3.9.2
+wp core update --version=3.9.2
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
