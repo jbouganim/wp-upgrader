@@ -1,5 +1,9 @@
 #!/bin/bash
-# This is meant to be run inside project folder
+# This is meant to be run inside project webroot folder
+
+# require PhantomJS, installable via:
+# sudo apt-get install phantomjs
+command -v phantomjs >/dev/null 2>&1 || { echo >&2 "This script requirs PhantomJS but it's not installed. Aborting."; exit 1; }
 
 DIR=`dirname $0`
 PROJECT_ROOT=`pwd`
@@ -71,8 +75,9 @@ echo ${URLS[*]} | tr ' ' '\n' | sed -e 's/^/>> /'
 
 # cURL URLS!
 for url in $URLS; do
-	echo "* -- Hitting $url"
-	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
+#	echo "* -- Hitting $url"
+#	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
+	phantomjs $DIR/request.js $url
 done
 
 # UPGRADE ROUTING
@@ -101,8 +106,9 @@ sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after.log|" $DIR/mu-plugins/php_error_log_handl
 
 # cURL URLS!
 for url in $URLS; do
-	echo "* -- Hitting $url"
-	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
+#	echo "* -- Hitting $url"
+#	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
+	phantomjs $DIR/request.js $url
 done
 
 echo "* Removing the mu-plugin"
