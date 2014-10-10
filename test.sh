@@ -46,7 +46,7 @@ else
 	git checkout -f # clean any unsaved changes
 	git checkout master # checkout the master branch
 fi
-git checkout -b upgrade || echo 'Could not create upgrade branch'; exit 1; # create a new upgrade branch, and exit if failed
+git checkout -b upgrade || ( echo 'Could not create upgrade branch'; exit 1; ) # create a new upgrade branch, and exit if failed
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
