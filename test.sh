@@ -49,7 +49,7 @@ fi
 git checkout -b upgrade || ( echo 'Could not create upgrade branch'; exit 1; ) # create a new upgrade branch, and exit if failed
 
 # Add our mu-plugin to collect 'error_log's
-sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # Get homepage links
 echo "* Extracting link list from $SITEURL"
@@ -98,7 +98,7 @@ for plugin in $PLUGINS; do
 done
 
 # Add our mu-plugin to collect 'error_log's
-sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # cURL URLS!
 for url in $URLS; do
@@ -110,7 +110,7 @@ echo "* Removing the mu-plugin"
 rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # Comparing logs folders
-LOG_DIFF=$( diff -rq $TMP/before $TMP/after )
+LOG_DIFF=$( diff -rq $TMP/before.log $TMP/after.log )
 
 if [ ! $LOG_DIFF ]; then
 	# Restore DB snapshot
