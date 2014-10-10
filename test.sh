@@ -64,10 +64,9 @@ do
 	URLS+="$link "
 done
 
-echo "* All URLS:"
-URLS=$( echo $URLS | tr ' ' '\n' | sort -u )
 
 echo "* Final URL list:"
+URLS=$( echo $URLS | tr ' ' '\n' | sort -u )
 echo ${URLS[*]} | tr ' ' '\n' | sed -e 's/^/>> /'
 
 # cURL URLS!
