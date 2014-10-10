@@ -31,7 +31,8 @@ chmod 777 $TMP/{before,after}.log
 
 # Backup DB
 echo "* Exporting DB"
-wp db export $TMP/before.sql
+#wp db export $TMP/before.sql
+
 
 # Switching to a new branch
 echo "* Switching to 'upgrade' branch"
@@ -121,8 +122,8 @@ if [ ! $LOG_DIFF ]; then
 	# Restore DB snapshot
 	git checkout -f
 	git checkout master
-	wp db reset --yes
-	wp db import $TMP/before.sql
+#	wp db reset --yes
+#	wp db import $TMP/before.sql
 	echo 'Different log entries detected, upgrade needs manual handling.'
 	echo $LOG_DIFF
 	exit 1
