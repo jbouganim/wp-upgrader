@@ -32,6 +32,12 @@ wp db export $TMP/before.sql
 # Switching to a new branch
 echo "* Switching to 'upgrade' branch"
 cd $SITEROOT
+
+# Clean any git submodule references, so we can create the new repo
+for GITREF in $(find `pwd`/wp-content/plugins/ -maxdepth 5 -name '.git'); do
+        rm $GITREF;
+done
+
 if [ -d "$SITEROOT" ]; then
 	git init
 	git add .
