@@ -22,6 +22,8 @@ echo "* WP_CONTENT detected as $WP_CONTENT_DIR"
 echo "* Creating temporary directory $TMP"
 rm -fr $TMP
 mkdir -p $TMP/{before,after}
+touch $TMP/{before,after}.log
+chmod 777 $TMP/{before,after}.log
 
 # Backup DB
 echo "* Exporting DB"
