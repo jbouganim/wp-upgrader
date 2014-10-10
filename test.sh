@@ -6,6 +6,10 @@ PROJECT_ROOT=`pwd`
 HASH=`md5sum <<< "$PROJECT_ROOT" | awk '{ print $1 }'`
 TMP="/tmp/wp-upgrader/$HASH"
 USERAGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko, L_y_n_x) Chrome/21.0.1180.79 Safari/537.1"
+
+shopt -s expand_aliases
+alias wp='wp --url="http://vvv.chatelaine.com"'
+
 SITEROOT=`wp eval 'echo realpath(ABSPATH);'`
 SITEURL=`wp option get siteurl`
 WP_CONTENT_DIR=`wp eval 'echo WP_CONTENT_DIR;'`
