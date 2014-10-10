@@ -41,7 +41,7 @@ done
 if [ -d "$SITEROOT" ]; then
 	git init
 	git add .
-	git commit -m 'First commit'
+	git commit -q -m 'First commit'
 else
 	git checkout -f # clean any unsaved changes
 	git checkout master # checkout the master branch
