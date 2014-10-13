@@ -78,7 +78,7 @@ echo ${URLS[*]} | tr ' ' '\n' | sed -e 's/^/>> /'
 for url in $URLS; do
 #	echo "* -- Hitting $url"
 #	curl -L -A "$USERAGENT" `awk '{ print $1 }' <<< $url` >/dev/null 2>&1
-	phantomjs $DIR/request.js $url
+	phantomjs $DIR/request.js "$url"
 done
 
 # UPGRADE ROUTING
