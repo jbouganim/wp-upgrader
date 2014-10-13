@@ -22,13 +22,26 @@ console.log('Hitting ' + address);
 phantom.onError = function(msg, trace) {
     var msgStack = ['PHANTOM ERROR: ' + msg];
     if (trace && trace.length) {
-        msgStack.push('TRACE:');
         trace.forEach(function(t) {
-            msgStack.push(' -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
+            msgStack.push('  -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
         });
     }
     console.error(msgStack.join('\n'));
     phantom.exit();
+};
+
+page.onError = function(msg, trace) {
+    var msgStack = ['PAGE ERROR: ' + msg];
+    if (trace && trace.length) {
+        trace.forEach(function(t) {
+            msgStack.push('  -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
+        });
+    }
+    console.error(msgStack.join('\n'));
+};
+
+page.onConsoleMessage = function(msg, lineNum, sourceId) {
+    console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
 };
 
 // Tracking pending requests
