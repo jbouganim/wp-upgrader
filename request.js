@@ -1,70 +1,90 @@
 /*global phantom*/
-var page = require('webpage').create(),
-    system = require('system'),
-    t, address;
+phantom.injectJs('helper.js');
 
-if (system.args.length === 1) {
-    console.log('Usage: request.js <some URL>');
-    phantom.exit();
+var page, startURL, user, pass;
+
+if ( system.args.length === 1 ) {
+	console.log('Usage: backend.js <some URL> user pass');
+	phantom.exit();
 }
 
-// Custom user agent
-//page.settings.useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1";
+startURL = system.args[1];
 
-// Timeout
-//page.settings.resourceTimeout = 5000; // 5 seconds
+if ( system.args.length === 4 ) {
+	user = system.args[2];
+	pass = system.args[3];
+}
 
-t = Date.now();
-address = system.args[1];
-console.log('Hitting ' + address);
+async.series([
 
-// @todo Outputs to stdin, which should be collected and logged to a file
-phantom.onError = function(msg, trace) {
-    var msgStack = ['PHANTOM ERROR: ' + msg];
-    if (trace && trace.length) {
-        trace.forEach(function(t) {
-            msgStack.push('  -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
-        });
-    }
-    console.error(msgStack.join('\n'));
-    phantom.exit();
-};
+	// 1. Load the start page
+	function(callback) {
+		console.log('-> # Load start page');
+		page = loadPage(startURL, function(){
+			callback();
+		}, getNewPage());
+	},
 
-page.onError = function(msg, trace) {
-    var msgStack = ['PAGE ERROR: ' + msg];
-    if (trace && trace.length) {
-        trace.forEach(function(t) {
-            msgStack.push('  -> ' + (t.file || t.sourceURL) + ': ' + t.line + (t.function ? ' (in function ' + t.function +')' : ''));
-        });
-    }
-    console.error(msgStack.join('\n'));
-};
+	// 2. Check for a login form, adding user/pass and submitting form if found
+	function(callback) {
+		jQueryify(page);
 
-page.onConsoleMessage = function(msg, lineNum, sourceId) {
-    console.log('CONSOLE: ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
-};
+		var isLogin = page.evaluate(function(){
+			return jQuery('body.login.login-action-login.wp-core-ui #loginform').length !== 0;
+		});
+		// Skip if not a login page, so we're probably on the front-end
+		if ( ! isLogin ) {
+			callback();
+			return;
+		}
 
-// Tracking pending requests
-//var requests = {};
-//page.onResourceRequested = function (request) {
-//    requests[request.id] = request.url;
-//};
-//page.onResourceReceived = function (response) {
-//    delete requests[response.id];
-//    //console.log( 'Loaded ' + response.id, JSON.stringify( requests ) );
-//};
+		console.log('-> # Found login form, logging in');
 
-page.onResourceTimeout = function(request) {
-    console.log('Request #' + request.id + ' to ' + request.url + ' has timed out.');
-};
+		// Submit the form
+		page.evaluate(function (user, pass) {
+			jQuery('#user_login').val(user);
+			jQuery('#user_pass').val(pass);
+			jQuery('#loginform').submit();
+		}, user, pass);
 
-page.open(address, function(status) {
-    if (status !== 'success') {
-        console.log('FAIL to load the address');
-    }
-    else {
-        t = Date.now() - t;
-        console.log('Loading time ' + t + ' msec');
-    }
-    phantom.exit();
-});
+		// End only on redirection finished
+		page.onLoadFinished = function() {
+			callback();
+		}
+	},
+
+	// 3. Get list of links on page and traverse them
+	function (callback) {
+		console.log('-> # Traversing links');
+
+		// Just in case
+		jQueryify(page);
+
+		// Get list of menu items to traverse
+		var urls = page.evaluate(function (startURL) {
+			var isAdmin, linksContainer;
+
+			// Check if we're on an admin page
+			isAdmin = jQuery('body').hasClass('wp-admin');
+
+			// Only traverse admin menu if on admin pages
+			linksContainer = isAdmin ? '#adminmenu' : 'body';
+
+			// Get URLs to traverse
+			return jQuery('a[href]', linksContainer)
+				.filter(function(i, el){
+					if ( el.href.indexOf(startURL) === -1 ) {
+						return false;
+					}
+					return true;
+				})
+				.map(function (i, el) {
+					return el.href;
+				}).toArray();
+		}, startURL);
+
+		traverseURLs(urls, null, phantom.exit);
+		callback();
+	}
+]);
+
