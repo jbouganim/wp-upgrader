@@ -97,7 +97,7 @@ function loadPage(url, callback, existingPage) {
     var page = existingPage || getNewPage();
     page.open(url, function (status) {
         var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        page.render('/tmp/phantomjs_' + filename + '.jpg', {
+        page.render( shotsDir + filename + '.jpg', {
             format:  'jpeg',
             quality: '100'
         });

@@ -1,18 +1,19 @@
 /*global phantom*/
 phantom.injectJs('helper.js');
 
-var page, startURL, user, pass;
+var page, startURL, shotsDir, user, pass;
 
 if ( system.args.length === 1 ) {
-	console.log('Usage: backend.js <some URL> user pass');
+	console.log('Usage: backend.js shots-directory <some URL> user pass');
 	phantom.exit();
 }
 
 startURL = system.args[1];
+shotsDir = system.args[2];
 
-if ( system.args.length === 4 ) {
-	user = system.args[2];
-	pass = system.args[3];
+if ( system.args.length === 5 ) {
+	user = system.args[3];
+	pass = system.args[4];
 }
 
 async.series([
