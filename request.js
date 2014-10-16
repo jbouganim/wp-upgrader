@@ -31,7 +31,8 @@ async.series([
 		jQueryify(page);
 
 		var isLogin = page.evaluate(function(){
-			return jQuery('body.login.login-action-login.wp-core-ui #loginform').length !== 0;
+			//return jQuery('body.login.login-action-login.wp-core-ui #loginform').length !== 0;
+			return jQuery('#loginform').length !== 0;
 		});
 		// Skip if not a login page, so we're probably on the front-end
 		if ( ! isLogin ) {
@@ -41,6 +42,11 @@ async.series([
 
 		console.log('-> # Found login form, logging in');
 
+		// End only on redirection finished
+		page.onLoadFinished = function() {
+			callback();
+		};
+
 		// Submit the form
 		page.evaluate(function (user, pass) {
 			jQuery('#user_login').val(user);
@@ -48,10 +54,6 @@ async.series([
 			jQuery('#loginform').submit();
 		}, user, pass);
 
-		// End only on redirection finished
-		page.onLoadFinished = function() {
-			callback();
-		}
 	},
 
 	// 3. Get list of links on page and traverse them
