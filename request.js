@@ -26,6 +26,37 @@ async.series([
 		}, getNewPage());
 	},
 
+	// Database upgrade page check
+	function(callback) {
+		jQueryify(page);
+
+		var isUpdate;
+
+		isUpdate = page.evaluate(function(){
+			return /wp-admin\/upgrade.php/.test(window.location.href);
+		});
+
+		if ( ! isUpdate ) {
+			callback();
+			return;
+		}
+
+		// End only on redirection finished
+		page.onLoadFinished = function() {
+			page.evaluate(function(){
+				jQuery('.button-large').click(); // the 'Continue' button
+			});
+
+			page.onLoadFinished = function() {
+				callback();
+			}
+		};
+
+		page.evaluate(function(){
+			jQuery('.button-large').click(); // Click the Update WordPress Database button
+		});
+	},
+
 	// 2. Check for a login form, adding user/pass and submitting form if found
 	function(callback) {
 		jQueryify(page);
