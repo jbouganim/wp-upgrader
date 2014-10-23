@@ -25,3 +25,4 @@
 - Run `bash /path/to/script/repo/start.sh 2>&1 | tee /tmp/wp-upgrader/start.log`
 
 The script will run, as noted above, and you'll have a complete log of the process in `/tmp/wp-upgrader/start.log`, while still be able to see the progress on the screen
+You will then be able to check screenshots and logs under `/tmp/wp-upgrader/{site-hash} in both folders {before/after}
