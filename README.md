@@ -3,8 +3,8 @@
 ## What does this script do ?
 
 - Detects Site meta, URL, wp-content directory, etc..
-- Create a temporary directory in /tmp/wp-upgrader/{site-hash}
-- Creates a new admin user called wpupgrade, so it can later traverse the admin pages
+- Create a temporary directory in `/tmp/wp-upgrader/{site-hash}`
+- Creates a new admin user called `wpupgrade`, so it can later traverse the admin pages
 - Injects a mu-plugin that redirects all PHP errors to a log file, in `before/php.log` file
 - Fetches the homepage
 - Traversing all local links in homepage, while doing couple of tasks:
@@ -25,4 +25,4 @@
 - Run `bash /path/to/script/repo/start.sh 2>&1 | tee /tmp/wp-upgrader/start.log`
 
 The script will run, as noted above, and you'll have a complete log of the process in `/tmp/wp-upgrader/start.log`, while still be able to see the progress on the screen
-You will then be able to check screenshots and logs under `/tmp/wp-upgrader/{site-hash} in both folders {before/after}
+You will then be able to check screenshots and logs under `/tmp/wp-upgrader/{site-hash}` in both folders {before/after}
