@@ -61,7 +61,7 @@ wp user create wpupgrade wpugrade@test.test --role=administrator --user_pass=wpu
 echo "* Collecting PHP/JS errors from site/backend pages"
 phantomjs $DIR/request.js "$SITEURL" "$TMP/before/shots/" | tee $TMP/before/phantom-site.log
 phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/" wpupgrade wpupgrade | tee $TMP/before/phantom-admin.log
-exit; #DEBUG
+
 # UPGRADE ROUTING
 # ---------------
 
