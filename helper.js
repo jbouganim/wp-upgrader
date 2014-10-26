@@ -81,7 +81,7 @@ function getNewPage() {
 	//page.settings.useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1";
 
 	// Timeout
-	//page.settings.resourceTimeout = 5000; // 5 seconds
+	page.settings.resourceTimeout = 30000; // 30 seconds
 
 	return page;
 }
