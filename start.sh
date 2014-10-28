@@ -68,7 +68,7 @@ phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/" wpupgrade wp
 echo "* Updating WordPress"
 wp core update --version=3.9.2
 echo "* Getting list of plugins with available updates"
-wp plugin update --all --dry-run >/dev/null 2>&1 # so we have update availability information
+wp plugin update --all --dry-run 2>/dev/null # so we have update availability information
 PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available | sed 1d )
 printf "*- %s\n" ${PLUGINS[@]}
 
