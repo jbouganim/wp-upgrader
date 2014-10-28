@@ -63,6 +63,17 @@ function onPageResourceTimeout(request) {
 }
 
 /**
+ * Apply timeout timer to stop window scripts and jump to ready state
+ */
+function onLoadStartedApplyTimeout(){
+	page.evaluate(function(){
+		var url = window.location.href;
+		console.log('-- Loading ' + url);
+		setTimeout(window.stop, 10000);
+	});
+}
+
+/**
  * Get a new Page
  * @returns Phantom::WebPage
  */
@@ -82,6 +93,8 @@ function getNewPage() {
 
 	// Timeout
 	page.settings.resourceTimeout = 30000; // 30 seconds
+	page.settings.loadImages = false;
+	//page.onLoadStarted = onLoadStartedApplyTimeout;
 
 	return page;
 }
