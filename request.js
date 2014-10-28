@@ -4,7 +4,7 @@ phantom.injectJs('helper.js');
 var page, startURL, shotsDir, user, pass;
 
 if ( system.args.length === 1 ) {
-	console.log('Usage: backend.js shots-directory <some URL> user pass');
+	console.log('Usage: request.js shots-directory <some URL> user pass');
 	phantom.exit();
 }
 
