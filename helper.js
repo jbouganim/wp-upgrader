@@ -160,6 +160,11 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 
 	urls = _.unique(urls);
 
+	if ( urls.length <= 1 ) {
+		traverseCompleteCallback();
+		return queue;
+	}
+
 	for ( var i = 0; i < urls.length; i++ ) {
 		queue.push(urls[i]);
 	}
