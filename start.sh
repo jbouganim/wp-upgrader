@@ -91,6 +91,7 @@ phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/after/shots/" wpupgrade wpu
 
 echo "* Removing the mu-plugin"
 rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+wp user delete wpupgrade --yes --reassign=1
 
 # Comparing logs folders
 LOG_DIFF="$( diff -rq $TMP/before $TMP/after )"
