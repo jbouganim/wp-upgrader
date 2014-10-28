@@ -117,7 +117,9 @@ async.series([
 				}).toArray();
 		}, startURL);
 
-		traverseURLs(urls, null, phantom.exit);
+		traverseURLs(urls, null, function(){
+			phantom.exit();
+		});
 		callback();
 	}
 ]);
