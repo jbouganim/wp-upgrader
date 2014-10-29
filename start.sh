@@ -90,6 +90,8 @@ done
 wp cache flush 2>/dev/null
 sudo service memcached restart
 
+read -p "WordPress updated, press [Enter] key to continue process..."
+
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after/php.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
