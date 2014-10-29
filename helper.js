@@ -89,7 +89,7 @@ function getNewPage() {
 	};
 
 	// Custom user agent
-	//page.settings.useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1";
+	page.settings.useragent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36";
 
 	// Timeout
 	page.settings.resourceTimeout = 30000; // 30 seconds
