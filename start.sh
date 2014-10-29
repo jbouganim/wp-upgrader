@@ -69,7 +69,11 @@ echo "* Updating WordPress"
 wp core update --version=3.9.2
 echo "* Getting list of plugins with available updates"
 wp plugin update --all --dry-run 2>/dev/null # so we have update availability information
-PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available | sed 1d )
+PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available 2>/dev/null | sed 1d )
+# Exclude some plugins from being updated
+EXCLUDED=(brightcove-video-cloud wp-polls)
+for EXCL in ${EXCLUDED[@]}; do PLUGINS=(${PLUGINS[@]/#%$EXCL}); done
+
 printf "*- %s\n" ${PLUGINS[@]}
 
 echo "* Updating plugins"
