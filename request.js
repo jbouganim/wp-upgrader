@@ -107,7 +107,7 @@ async.series([
 			// Only traverse admin menu if on admin pages
 			linksContainer = isAdmin ? '#adminmenu' : 'body';
 
-			logoutURL = startURL.replace(/wp-admin\/?/, '');
+			logoutURL = startURL.replace(/wp-admin\/?/, '') + '/wp-login.php?loggedout=true';
 
 			// Get URLs to traverse
 			urls = jQuery('a[href]', linksContainer)
