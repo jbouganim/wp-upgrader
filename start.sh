@@ -25,7 +25,7 @@ echo "* WP_CONTENT detected as $WP_CONTENT_DIR"
 # Create our tmp directory
 echo "* Creating temporary directory $TMP"
 rm -fr $TMP
-mkdir -p $TMP/{before,after}/shots
+mkdir -p $TMP/{before,after}/shots/{front,back}
 chmod -R 777 $TMP/{before,after}
 
 # Backup DB
@@ -59,8 +59,8 @@ wp user create wpupgrade wpugrade@test.test --role=administrator --user_pass=wpu
 
 # Traverse the site homepage, and all links within
 echo "* Collecting PHP/JS errors from site/backend pages"
-phantomjs $DIR/request.js "$SITEURL" "$TMP/before/shots/" | tee $TMP/before/phantom-site.log
-phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/" wpupgrade wpupgrade | tee $TMP/before/phantom-admin.log
+phantomjs $DIR/request.js "$SITEURL" "$TMP/before/shots/front/" | tee $TMP/before/phantom-site.log
+phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/back/" wpupgrade wpupgrade | tee $TMP/before/phantom-admin.log
 
 # UPGRADE ROUTING
 # ---------------
@@ -94,8 +94,8 @@ sudo service memcached restart
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after/php.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # Traverse the site homepage, and all links within, then wp-admin
-phantomjs $DIR/request.js "$SITEURL" "$TMP/after/shots/" | tee $TMP/after/phantom-site.log
-phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/after/shots/" wpupgrade wpupgrade | tee $TMP/after/phantom-admin.log
+phantomjs $DIR/request.js "$SITEURL" "$TMP/after/shots/front/" | tee $TMP/after/phantom-site.log
+phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/after/shots/back/" wpupgrade wpupgrade | tee $TMP/after/phantom-admin.log
 
 echo "* Removing the mu-plugin"
 rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
