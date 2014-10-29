@@ -41,15 +41,18 @@ async.series([
 			return;
 		}
 
+		console.log('-> # Found DB Update form, submitting');
+
 		// End only on redirection finished
 		page.onLoadFinished = function() {
+			page.onLoadFinished = function() {
+				callback();
+			};
+
+			jQueryify(page);
 			page.evaluate(function(){
 				jQuery('.button-large').click(); // the 'Continue' button
 			});
-
-			page.onLoadFinished = function() {
-				callback();
-			}
 		};
 
 		page.evaluate(function(){
