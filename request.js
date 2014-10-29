@@ -99,7 +99,7 @@ async.series([
 
 		// Get list of menu items to traverse
 		var urls = page.evaluate(function (startURL) {
-			var isAdmin, linksContainer;
+			var isAdmin, linksContainer, logoutURL, urls;
 
 			// Check if we're on an admin page
 			isAdmin = jQuery('body').hasClass('wp-admin');
@@ -107,8 +107,10 @@ async.series([
 			// Only traverse admin menu if on admin pages
 			linksContainer = isAdmin ? '#adminmenu' : 'body';
 
+			logoutURL = startURL.replace(/wp-admin\/?/, '');
+
 			// Get URLs to traverse
-			return jQuery('a[href]', linksContainer)
+			urls = jQuery('a[href]', linksContainer)
 				.filter(function(i, el){
 					if ( el.href.indexOf(startURL) === -1 ) {
 						return false;
@@ -118,12 +120,16 @@ async.series([
 				.map(function (i, el) {
 					return el.href;
 				}).toArray();
+
+			urls.push(logoutURL);
+
+			return urls;
 		}, startURL);
 
 		traverseURLs(urls, null, function(){
+			callback();
 			phantom.exit();
 		});
-		callback();
 	}
 ]);
 
