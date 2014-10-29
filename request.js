@@ -1,7 +1,7 @@
 /*global phantom*/
 phantom.injectJs('helper.js');
 
-var page, startURL, shotsDir, user, pass;
+var page, startURL, shotsDir, user, pass, url2png;
 
 if ( system.args.length === 1 ) {
 	console.log('Usage: request.js shots-directory <some URL> user pass');
@@ -14,6 +14,12 @@ shotsDir = system.args[2];
 if ( system.args.length === 5 ) {
 	user = system.args[3];
 	pass = system.args[4];
+}
+
+try {
+	url2png = require('./url2png.json');
+} catch(e) {
+	url2png = {};
 }
 
 async.series([

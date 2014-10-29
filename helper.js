@@ -1,12 +1,14 @@
 /*globals phantom, async, loadInProgress, user, pass*/
 
-var system, webpage;
+var system, webpage, childProcess;
 
 system = require('system');
 webpage = require('webpage');
+childProcess = require('child_process');
 
 phantom.injectJs('libs/async.js');
 phantom.injectJs('libs/underscore.js');
+phantom.injectJs('libs/md5.js');
 
 /**
  * Warn on Phantom errors
@@ -119,17 +121,35 @@ function loadPage(url, callback, existingPage) {
 		    console.log('-- Loaded ' + url);
 	    }
 
-	    setTimeout(function(){
-	        page.render( shotsDir + filename + '.jpg', {
-	            format:  'jpeg',
-	            quality: '100'
-	        });
-	    }, 2000);
+	    if ( url2png.hasOwnProperty('apiKey') && ! /wp-admin/.test(url) ) {
+		    var shotUrl, hash, args;
 
-        if ( !existingPage ) {
-            page.close();
-        }
-        callback();
+		    args = '?fullpage=true&viewport=1200x800&unique='+ Date.now() +'&url=' + url;
+		    hash = CryptoJS.MD5( args + url2png.secretKey );
+		    shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
+
+		    args = [shotUrl, '-O', shotsDir + filename + '.png'];
+
+		    childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
+			    if ( !existingPage ) {
+				    page.close();
+			    }
+			    callback();
+		    });
+	    } else {
+		    setTimeout(function(){
+		        page.render( shotsDir + filename + '.jpg', {
+		            format:  'jpeg',
+		            quality: '100'
+		        });
+		    }, 2000);
+
+	        if ( !existingPage ) {
+	            page.close();
+	        }
+            callback();
+	    }
+
     });
     return page;
 }
