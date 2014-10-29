@@ -111,17 +111,21 @@ function loadPage(url, callback, existingPage) {
     console.log('-- Loading ' + url);
 
     page.open(url, function (status) {
-        var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        page.render( shotsDir + filename + '.jpg', {
-            format:  'jpeg',
-            quality: '100'
-        });
+	    var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-        if ( status !== 'success' ) {
-            console.log('-- Unable to open url > ' + url);
-        } else {
-            console.log('-- Loaded ' + url);
-        }
+	    if ( status !== 'success' ) {
+		    console.log('-- Unable to open url > ' + url);
+	    } else {
+		    console.log('-- Loaded ' + url);
+	    }
+
+	    setTimeout(function(){
+	        page.render( shotsDir + filename + '.jpg', {
+	            format:  'jpeg',
+	            quality: '100'
+	        });
+	    }, 2000);
+
         if ( !existingPage ) {
             page.close();
         }
