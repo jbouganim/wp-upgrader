@@ -164,7 +164,7 @@ function loadPage(url, callback, existingPage) {
  * @return Async::Queue
  */
 function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
-	console.log('-- Hitting '+ urls.length +' URLs queue');
+
 	var queue = async.queue(function (url, callback) {
         loadPage(url, function(){
             if ( pageCompleteCallback ) {
@@ -183,6 +183,8 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 	};
 
 	urls = _.unique(urls);
+
+	console.log('-- Hitting '+ urls.length +' URLs queue');
 
 	if ( urls.length <= 1 ) {
 		traverseCompleteCallback();
