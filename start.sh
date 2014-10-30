@@ -72,7 +72,7 @@ wp plugin update --all --dry-run 2>/dev/null # so we have update availability in
 PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available 2>/dev/null | sed 1d )
 # Exclude some plugins from being updated
 EXCLUDED=(brightcove-video-cloud wp-polls)
-for EXCL in ${EXCLUDED[@]}; do PLUGINS=(${PLUGINS[@]/%$EXCL}); done # this will match against names that end with EXCL (the % part )
+for EXCL in ${EXCLUDED[@]}; do PLUGINS=(${PLUGINS[@]/$EXCL}); done # this will match against names that end with EXCL (the % part )
 
 printf "*- %s\n" ${PLUGINS[@]}
 
