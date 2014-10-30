@@ -142,12 +142,12 @@ function loadPage(url, callback, existingPage) {
 		            format:  'jpeg',
 		            quality: '100'
 		        });
+		        if ( !existingPage ) {
+		            page.close();
+		        }
+                callback();
 		    }, 2000);
 
-	        if ( !existingPage ) {
-	            page.close();
-	        }
-            callback();
 	    }
 
     });
