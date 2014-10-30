@@ -112,45 +112,52 @@ function loadPage(url, callback, existingPage) {
     var page = existingPage || getNewPage();
     console.log('-- Loading ' + url);
 
-    page.open(url, function (status) {
-	    var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+	var timer = setTimeout( function(){
+		console.log('TIMED OUT, closing page immaturely');
+		onPageLoad();
+	}, 120000 );
 
-	    if ( status !== 'success' ) {
-		    console.log('-- Unable to open url > ' + url);
-	    } else {
-		    console.log('-- Loaded ' + url);
-	    }
+	var onPageLoad = function (status) {
+		var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-	    if ( url2png.hasOwnProperty('apiKey') && ! /wp-admin/.test(url) ) {
-		    var shotUrl, hash, args;
+		if ( status !== 'success' ) {
+			console.log('-- Unable to open url > ' + url);
+		} else {
+			console.log('-- Loaded ' + url);
+		}
 
-		    args = '?fullpage=true&viewport=1200x800&unique='+ Date.now() +'&url=' + url;
-		    hash = CryptoJS.MD5( args + url2png.secretKey );
-		    shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
+		if ( url2png.hasOwnProperty('apiKey') && ! /wp-admin/.test(url) ) {
+			var shotUrl, hash, args;
 
-		    args = [shotUrl, '-O', shotsDir + filename + '.png'];
+			args = '?fullpage=true&viewport=1200x800&unique='+ Date.now() +'&url=' + url;
+			hash = CryptoJS.MD5( args + url2png.secretKey );
+			shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
 
-		    childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
-			    if ( !existingPage ) {
-				    page.close();
-			    }
-			    callback();
-		    });
-	    } else {
-		    setTimeout(function(){
-		        page.render( shotsDir + filename + '.jpg', {
-		            format:  'jpeg',
-		            quality: '100'
-		        });
-		        if ( !existingPage ) {
-		            page.close();
-		        }
-                callback();
-		    }, 2000);
+			args = [shotUrl, '-O', shotsDir + filename + '.png'];
 
-	    }
+			childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
+				if ( !existingPage ) {
+					page.close();
+				}
+				clearTimeout(timer);
+				callback();
+			});
+		} else {
+			setTimeout(function(){
+				page.render( shotsDir + filename + '.jpg', {
+					format:  'jpeg',
+					quality: '100'
+				});
+				if ( !existingPage ) {
+					page.close();
+				}
+				clearTimeout(timer);
+				callback();
+			}, 2000);
+		}
+	};
 
-    });
+    page.open(url, onPageLoad);
     return page;
 }
 
