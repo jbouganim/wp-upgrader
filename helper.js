@@ -192,6 +192,7 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 	urls = _.unique(urls);
 
 	console.log('-- Hitting '+ urls.length +' URLs queue');
+	console.log(' -* ' + urls.join("\n -* "));
 
 	if ( urls.length <= 1 ) {
 		traverseCompleteCallback();
