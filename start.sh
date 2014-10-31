@@ -67,6 +67,8 @@ phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/back/" wpupgra
 
 echo "* Updating WordPress"
 wp core update --version=3.9.2
+wp core update-db
+
 echo "* Getting list of plugins with available updates"
 wp plugin update --all --dry-run 2>/dev/null # so we have update availability information
 PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available 2>/dev/null | sed 1d )
@@ -90,7 +92,7 @@ done
 wp cache flush 2>/dev/null
 sudo service memcached restart
 
-read -p "WordPress updated, press [Enter] key to continue process..."
+#read -p "WordPress updated, press [Enter] key to continue process..."
 
 # Add our mu-plugin to collect 'error_log's
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after/php.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
