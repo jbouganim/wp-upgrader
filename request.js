@@ -66,8 +66,6 @@ var steps  = {
 			// Only traverse admin menu if on admin pages
 			linksContainer = isAdmin ? '#adminmenu' : 'body';
 
-			logoutURL = startURL.replace(/wp-admin\/?/, '') + '/wp-login.php?loggedout=true';
-
 			// Get URLs to traverse
 			urls = jQuery('a[href]', linksContainer)
 				.filter(function(i, el){
@@ -80,7 +78,10 @@ var steps  = {
 					return el.href;
 				}).toArray();
 
-			urls.push(logoutURL);
+			if ( isAdmin ) {
+				logoutURL = startURL.replace(/wp-admin\/?/, '') + '/wp-login.php?loggedout=true';
+				urls.push(logoutURL);
+			}
 
 			return urls;
 		}, startURL);
