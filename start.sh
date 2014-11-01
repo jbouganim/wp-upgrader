@@ -8,7 +8,6 @@ command -v phantomjs >/dev/null 2>&1 || { echo >&2 "This script requirs PhantomJ
 DIR=`dirname $0`
 PROJECT_ROOT=`pwd`
 HASH=`md5sum <<< "$PROJECT_ROOT" | awk '{ print $1 }'`
-TMP="/tmp/wp-upgrader/$HASH"
 
 shopt -s expand_aliases
 
@@ -17,6 +16,8 @@ alias wp="wp --url=\"$SITEURL\""
 
 SITEROOT=`wp eval 'echo realpath(ABSPATH);' 2> /dev/null`
 WP_CONTENT_DIR=`wp eval 'echo WP_CONTENT_DIR;' 2> /dev/null`
+
+TMP="/tmp/wp-upgrader/`echo $SITEURL | sed 's/https*\:\/\///;s/\/$//;s/[^a-z\.]/_/g'`/$HASH"
 
 echo "* Site URL detected as $SITEURL"
 echo "* Site Root detected as $SITEROOT"
@@ -59,8 +60,7 @@ wp user create wpupgrade wpugrade@test.test --role=administrator --user_pass=wpu
 
 # Traverse the site homepage, and all links within
 echo "* Collecting PHP/JS errors from site/backend pages"
-phantomjs $DIR/request.js "$SITEURL" "$TMP/before/shots/front/" | tee $TMP/before/phantom-site.log
-phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/before/shots/back/" wpupgrade wpupgrade | tee $TMP/before/phantom-admin.log
+phantomjs $DIR/request.js "$SITEURL/" "$TMP/before/shots/" wpupgrade wpupgrade | tee $TMP/before/phantom.log
 
 # UPGRADE ROUTING
 # ---------------
@@ -98,8 +98,7 @@ sudo service memcached restart
 sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after/php.log|" $DIR/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # Traverse the site homepage, and all links within, then wp-admin
-phantomjs $DIR/request.js "$SITEURL" "$TMP/after/shots/front/" | tee $TMP/after/phantom-site.log
-phantomjs $DIR/request.js "$SITEURL/wp-admin/" "$TMP/after/shots/back/" wpupgrade wpupgrade | tee $TMP/after/phantom-admin.log
+phantomjs $DIR/request.js "$SITEURL/" "$TMP/after/shots/" wpupgrade wpupgrade | tee $TMP/after/phantom.log
 
 echo "* Removing the mu-plugin"
 rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php

@@ -1,7 +1,7 @@
 /*global phantom*/
 phantom.injectJs('helper.js');
 
-var page, startURL, shotsDir, user, pass, url2png;
+var page, startURL, shotsDir, user, pass, url2png, isFrontEnd = true;
 
 if ( system.args.length === 1 ) {
 	console.log('Usage: request.js shots-directory <some URL> user pass');
@@ -22,48 +22,35 @@ try {
 	url2png = {};
 }
 
-async.series([
-
-	// 1. Load the start page
-	function(callback) {
-		console.log('-> # Load start page');
+var steps  = {
+	front: function(callback) {
+		console.log('-> # Load homepage');
 		page = loadPage(startURL, function(){
 			callback();
 		}, getNewPage());
 	},
+	back: function(callback) {
+		isFrontEnd = false;
+		console.log('-> # Load login page');
+		page = loadPage(startURL + 'wp-login.php?reauth=0&redirect=' + startURL + 'wp-admin/', function(){
+			jQueryify(page);
 
-	// 2. Check for a login form, adding user/pass and submitting form if found
-	function(callback) {
-		jQueryify(page);
+			console.log('-> # Logging in');
 
-		var isLogin = page.evaluate(function(){
-			//return jQuery('body.login.login-action-login.wp-core-ui #loginform').length !== 0;
-			return jQuery('#loginform').length !== 0;
-		});
-		// Skip if not a login page, so we're probably on the front-end
-		if ( ! isLogin ) {
-			callback();
-			return;
-		}
+			// End only on redirection finished
+			page.onLoadFinished = function() {
+				callback();
+			};
 
-		console.log('-> # Found login form, logging in');
-
-		// End only on redirection finished
-		page.onLoadFinished = function() {
-			callback();
-		};
-
-		// Submit the form
-		page.evaluate(function (user, pass) {
-			jQuery('#user_login').val(user);
-			jQuery('#user_pass').val(pass);
-			jQuery('#loginform').submit();
-		}, user, pass);
-
+			// Submit the form
+			page.evaluate(function (user, pass) {
+				jQuery('#user_login').val(user);
+				jQuery('#user_pass').val(pass);
+				jQuery('#loginform').submit();
+			}, user, pass);
+		}, getNewPage());
 	},
-
-	// 3. Get list of links on page and traverse them
-	function (callback) {
+	traverse: function(callback) {
 		console.log('-> # Traversing links');
 
 		// Just in case
@@ -103,5 +90,12 @@ async.series([
 			phantom.exit();
 		});
 	}
+};
+
+async.series([
+	steps.front,
+	steps.traverse,
+	steps.back,
+	steps.traverse
 ]);
 

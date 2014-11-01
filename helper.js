@@ -133,7 +133,7 @@ function loadPage(url, callback, existingPage) {
 			hash = CryptoJS.MD5( args + url2png.secretKey );
 			shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
 
-			args = [shotUrl, '-O', shotsDir + filename + '.png'];
+			args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
 
 			childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
 				if ( !existingPage ) {
@@ -144,7 +144,7 @@ function loadPage(url, callback, existingPage) {
 			});
 		} else {
 			setTimeout(function(){
-				page.render( shotsDir + filename + '.jpg', {
+				page.render( shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
 					format:  'jpeg',
 					quality: '100'
 				});
