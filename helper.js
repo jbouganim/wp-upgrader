@@ -113,11 +113,6 @@ function loadPage(url, callback, existingPage, postData) {
 	var postData = postData || null;
 	console.log('-- Loading ' + url);
 
-	var timer = setTimeout(function () {
-		console.log('TIMED OUT, closing page immaturely');
-		onPageLoad();
-	}, 120000);
-
 	var onPageLoad = function (status) {
 		var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
@@ -158,12 +153,18 @@ function loadPage(url, callback, existingPage, postData) {
 				}, 2000);
 			}
 		} else {
+			clearTimeout(timer);
 			callback(page);
 			if ( !existingPage ) {
 				page.close();
 			}
 		}
 	};
+
+	var timer = setTimeout(function () {
+		console.log('TIMED OUT, closing page immaturely');
+		onPageLoad();
+	}, 120000);
 
 	if ( postData ) {
 		var _postData = [];
