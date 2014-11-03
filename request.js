@@ -27,28 +27,25 @@ var steps  = {
 		console.log('-> # Load homepage');
 		page = loadPage(startURL, function(){
 			callback();
-		}, getNewPage());
+		});
 	},
 	back: function(callback) {
 		isFrontEnd = false;
 		console.log('-> # Load login page');
-		page = loadPage(startURL + 'wp-login.php?reauth=0&redirect=' + startURL + 'wp-admin/', function(){
-			jQueryify(page);
 
-			console.log('-> # Logging in');
-
-			// End only on redirection finished
-			page.onLoadFinished = function() {
+		page = loadPage(
+			startURL + 'wp-login.php',
+			function(page){
 				callback();
-			};
-
-			// Submit the form
-			page.evaluate(function (user, pass) {
-				jQuery('#user_login').val(user);
-				jQuery('#user_pass').val(pass);
-				jQuery('#loginform').submit();
-			}, user, pass);
-		}, getNewPage());
+			},
+			null,
+			{
+				log: user,
+				pwd: pass,
+				rememberme: 'forever',
+				redirect_to: startURL+ 'wp-admin/'
+			}
+		);
 	},
 	traverse: function(callback) {
 		console.log('-> # Traversing links');
@@ -85,8 +82,11 @@ var steps  = {
 
 		traverseURLs(urls, null, function(){
 			callback();
-			phantom.exit();
 		});
+	},
+	exit: function(callback) {
+		phantom.exit();
+		callback();
 	}
 };
 
@@ -94,6 +94,7 @@ async.series([
 	steps.front,
 	steps.traverse,
 	steps.back,
-	steps.traverse
+	steps.traverse,
+	steps.exit
 ]);
 

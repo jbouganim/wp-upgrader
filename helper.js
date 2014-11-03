@@ -108,8 +108,9 @@ function getNewPage() {
  * @param existingPage
  * @returns Phantom::WebPage
  */
-function loadPage(url, callback, existingPage) {
+function loadPage(url, callback, existingPage, postData) {
     var page = existingPage || getNewPage();
+	var postData = postData || null;
     console.log('-- Loading ' + url);
 
 	var timer = setTimeout( function(){
@@ -136,11 +137,11 @@ function loadPage(url, callback, existingPage) {
 			args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
 
 			childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
+				clearTimeout(timer);
+				callback(page);
 				if ( !existingPage ) {
 					page.close();
 				}
-				clearTimeout(timer);
-				callback();
 			});
 		} else {
 			setTimeout(function(){
@@ -148,16 +149,26 @@ function loadPage(url, callback, existingPage) {
 					format:  'jpeg',
 					quality: '100'
 				});
+				clearTimeout(timer);
+				callback(page);
 				if ( !existingPage ) {
 					page.close();
 				}
-				clearTimeout(timer);
-				callback();
 			}, 2000);
 		}
+		console.log(page.content)
 	};
 
-    page.open(url, onPageLoad);
+	if ( postData ) {
+		var _postData = [];
+		for ( i in postData ) {
+			if ( ! postData.hasOwnProperty(i) ) { continue; }
+			_postData.push( i + '=' + postData[i] );
+		}
+		page.open(url, 'post', _postData.join('&'), onPageLoad);
+	} else {
+		page.open(url, onPageLoad);
+	}
     return page;
 }
 
