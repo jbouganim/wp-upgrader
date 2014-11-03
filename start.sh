@@ -79,7 +79,7 @@ for EXCL in ${EXCLUDED[@]}; do PLUGINS=(${PLUGINS[@]/$EXCL}); done # this will m
 printf "*- %s\n" ${PLUGINS[@]}
 
 echo "* Updating plugins"
-for plugin in $PLUGINS; do
+for plugin in ${PLUGINS[@]}; do
 	if [ -a "$WP_CONTENT_DIR/plugins/$plugin/.git" ]; then
 		echo "** Ignoring $plugin since it is a submodule"
 	else
