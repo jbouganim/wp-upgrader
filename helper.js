@@ -127,34 +127,41 @@ function loadPage(url, callback, existingPage, postData) {
 			console.log('-- Loaded ' + url);
 		}
 
-		if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
-			var shotUrl, hash, args;
+		if ( takeShots ) {
+			if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
+				var shotUrl, hash, args;
 
-			args = '?fullpage=true&viewport=1200x800&unique=' + Date.now() + '&url=' + url;
-			hash = CryptoJS.MD5(args + url2png.secretKey);
-			shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
+				args = '?fullpage=true&viewport=1200x800&unique=' + Date.now() + '&url=' + url;
+				hash = CryptoJS.MD5(args + url2png.secretKey);
+				shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
 
-			args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
+				args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
 
-			childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
-				clearTimeout(timer);
-				callback(page);
-				if ( !existingPage ) {
-					page.close();
-				}
-			});
-		} else {
-			setTimeout(function () {
-				page.render(shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
-					format:  'jpeg',
-					quality: '100'
+				childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
+					clearTimeout(timer);
+					callback(page);
+					if ( !existingPage ) {
+						page.close();
+					}
 				});
-				clearTimeout(timer);
-				callback(page);
-				if ( !existingPage ) {
-					page.close();
-				}
-			}, 2000);
+			} else {
+				setTimeout(function () {
+					page.render(shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
+						format:  'jpeg',
+						quality: '100'
+					});
+					clearTimeout(timer);
+					callback(page);
+					if ( !existingPage ) {
+						page.close();
+					}
+				}, 2000);
+			}
+		} else {
+			callback(page);
+			if ( !existingPage ) {
+				page.close();
+			}
 		}
 	};
 

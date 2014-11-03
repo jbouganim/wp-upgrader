@@ -1,7 +1,7 @@
 /*global phantom*/
 phantom.injectJs('helper.js');
 
-var page, startURL, shotsDir, user, pass, url2png, isFrontEnd = true;
+var page, startURL, shotsDir, user, pass, url2png, isFrontEnd = true, takeShots = false;
 
 if ( system.args.length === 1 ) {
 	console.log('Usage: request.js shots-directory <some URL> user pass');
