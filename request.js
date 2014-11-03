@@ -18,36 +18,36 @@ if ( system.args.length === 5 ) {
 
 try {
 	url2png = require('./url2png.json');
-} catch(e) {
+} catch ( e ) {
 	url2png = {};
 }
 
-var steps  = {
-	front: function(callback) {
+var steps = {
+	front:    function (callback) {
 		console.log('-> # Load homepage');
-		page = loadPage(startURL, function(){
+		page = loadPage(startURL, function () {
 			callback();
 		});
 	},
-	back: function(callback) {
+	back:     function (callback) {
 		isFrontEnd = false;
 		console.log('-> # Load login page');
 
 		page = loadPage(
 			startURL + 'wp-login.php',
-			function(page){
+			function (page) {
 				callback();
 			},
 			null,
 			{
-				log: user,
-				pwd: pass,
+				log:        user,
+				pwd:        pass,
 				rememberme: 'forever',
-				redirect_to: startURL+ 'wp-admin/'
+				redirect_to: startURL + 'wp-admin/'
 			}
 		);
 	},
-	traverse: function(callback) {
+	traverse: function (callback) {
 		console.log('-> # Traversing links');
 
 		// Just in case
@@ -65,7 +65,7 @@ var steps  = {
 
 			// Get URLs to traverse
 			urls = jQuery('a[href]', linksContainer)
-				.filter(function(i, el){
+				.filter(function (i, el) {
 					return el.href.indexOf(startURL) !== -1;
 				})
 				.map(function (i, el) {
@@ -80,11 +80,11 @@ var steps  = {
 			return urls;
 		}, startURL);
 
-		traverseURLs(urls, null, function(){
+		traverseURLs(urls, null, function () {
 			callback();
 		});
 	},
-	exit: function(callback) {
+	exit:     function (callback) {
 		phantom.exit();
 		callback();
 	}

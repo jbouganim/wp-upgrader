@@ -67,8 +67,8 @@ function onPageResourceTimeout(request) {
 /**
  * Apply timeout timer to stop window scripts and jump to ready state
  */
-function onLoadStartedApplyTimeout(){
-	page.evaluate(function(){
+function onLoadStartedApplyTimeout() {
+	page.evaluate(function () {
 		var url = window.location.href;
 		console.log('-- Loading ' + url);
 		setTimeout(window.stop, 10000);
@@ -109,14 +109,14 @@ function getNewPage() {
  * @returns Phantom::WebPage
  */
 function loadPage(url, callback, existingPage, postData) {
-    var page = existingPage || getNewPage();
+	var page = existingPage || getNewPage();
 	var postData = postData || null;
-    console.log('-- Loading ' + url);
+	console.log('-- Loading ' + url);
 
-	var timer = setTimeout( function(){
+	var timer = setTimeout(function () {
 		console.log('TIMED OUT, closing page immaturely');
 		onPageLoad();
-	}, 120000 );
+	}, 120000);
 
 	var onPageLoad = function (status) {
 		var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
@@ -127,11 +127,11 @@ function loadPage(url, callback, existingPage, postData) {
 			console.log('-- Loaded ' + url);
 		}
 
-		if ( url2png.hasOwnProperty('apiKey') && ! /wp-admin/.test(url) ) {
+		if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
 			var shotUrl, hash, args;
 
-			args = '?fullpage=true&viewport=1200x800&unique='+ Date.now() +'&url=' + url;
-			hash = CryptoJS.MD5( args + url2png.secretKey );
+			args = '?fullpage=true&viewport=1200x800&unique=' + Date.now() + '&url=' + url;
+			hash = CryptoJS.MD5(args + url2png.secretKey);
 			shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
 
 			args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
@@ -144,8 +144,8 @@ function loadPage(url, callback, existingPage, postData) {
 				}
 			});
 		} else {
-			setTimeout(function(){
-				page.render( shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
+			setTimeout(function () {
+				page.render(shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
 					format:  'jpeg',
 					quality: '100'
 				});
@@ -162,14 +162,16 @@ function loadPage(url, callback, existingPage, postData) {
 	if ( postData ) {
 		var _postData = [];
 		for ( i in postData ) {
-			if ( ! postData.hasOwnProperty(i) ) { continue; }
-			_postData.push( i + '=' + postData[i] );
+			if ( !postData.hasOwnProperty(i) ) {
+				continue;
+			}
+			_postData.push(i + '=' + postData[i]);
 		}
 		page.open(url, 'post', _postData.join('&'), onPageLoad);
 	} else {
 		page.open(url, onPageLoad);
 	}
-    return page;
+	return page;
 }
 
 /**
@@ -184,12 +186,12 @@ function loadPage(url, callback, existingPage, postData) {
 function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 
 	var queue = async.queue(function (url, callback) {
-        loadPage(url, function(){
-            if ( pageCompleteCallback ) {
-                pageCompleteCallback();
-            }
-            callback();
-        });
+		loadPage(url, function () {
+			if ( pageCompleteCallback ) {
+				pageCompleteCallback();
+			}
+			callback();
+		});
 	}, 1); // number of concurrent jobs
 
 	// Final callback after loading of all urls
@@ -202,7 +204,7 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 
 	urls = _.unique(urls);
 
-	console.log('-- Hitting '+ urls.length +' URLs queue');
+	console.log('-- Hitting ' + urls.length + ' URLs queue');
 	console.log(' -* ' + urls.join("\n -* "));
 
 	if ( urls.length <= 1 ) {
@@ -222,7 +224,9 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
  * @param page
  */
 function jQueryify(page) {
-    if ( page.evaluate(function(){ return 'undefined' === typeof jQuery; }) ) {
-        page.injectJs('libs/jquery.js');
-    }
+	if ( page.evaluate(function () {
+			return 'undefined' === typeof jQuery;
+		}) ) {
+		page.injectJs('libs/jquery.js');
+	}
 }
