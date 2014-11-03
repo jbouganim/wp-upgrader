@@ -69,10 +69,7 @@ var steps  = {
 			// Get URLs to traverse
 			urls = jQuery('a[href]', linksContainer)
 				.filter(function(i, el){
-					if ( el.href.indexOf(startURL) === -1 ) {
-						return false;
-					}
-					return true;
+					return el.href.indexOf(startURL) !== -1;
 				})
 				.map(function (i, el) {
 					return el.href;
