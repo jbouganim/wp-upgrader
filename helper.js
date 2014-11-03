@@ -156,7 +156,6 @@ function loadPage(url, callback, existingPage, postData) {
 				}
 			}, 2000);
 		}
-		console.log(page.content)
 	};
 
 	if ( postData ) {
