@@ -113,57 +113,52 @@ function loadPage(url, callback, existingPage, postData) {
 	var postData = postData || null;
 	console.log('-- Loading ' + url);
 
-	var onPageLoad = function (status) {
+	var onPageLoad = function (status, skipTimer) {
 		var filename = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-		if ( status !== 'success' ) {
-			console.log('-- Unable to open url > ' + url);
-		} else {
-			console.log('-- Loaded ' + url);
-		}
-
-		if ( takeShots ) {
-			if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
-				var shotUrl, hash, args;
-
-				args = '?fullpage=true&viewport=1200x800&unique=' + Date.now() + '&url=' + url;
-				hash = CryptoJS.MD5(args + url2png.secretKey);
-				shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
-
-				args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
-
-				childProcess.execFile('wget', args, null, function (err, stdout, stderr) {
-					clearTimeout(timer);
-					callback(page);
-					if ( !existingPage ) {
-						page.close();
-					}
-				});
-			} else {
-				setTimeout(function () {
-					page.render(shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
-						format:  'jpeg',
-						quality: '100'
-					});
-					clearTimeout(timer);
-					callback(page);
-					if ( !existingPage ) {
-						page.close();
-					}
-				}, 2000);
-			}
-		} else {
-			clearTimeout(timer);
+		var wrapUp = function() {
+			skipTimer || clearTimeout(timer);
 			callback(page);
 			if ( !existingPage ) {
 				page.close();
+			}
+		};
+
+		if ( status !== 'success' ) {
+			console.log('-- Unable to open url > ' + url);
+			wrapUp();
+		} else {
+			console.log('-- Loaded ' + url);
+
+			if ( takeShots ) {
+				if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
+					var shotUrl, hash, args;
+
+					args = '?fullpage=true&viewport=1200x800&unique=' + Date.now() + '&url=' + url;
+					hash = CryptoJS.MD5(args + url2png.secretKey);
+					shotUrl = 'http://api.url2png.com/v6/' + url2png.apiKey + '/' + hash + '/png/' + args;
+
+					args = [shotUrl, '-O', shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.png'];
+
+					childProcess.execFile('wget', args, null, wrapUp);
+				} else {
+					setTimeout(function () {
+						page.render(shotsDir + ( isFrontEnd ? 'front/' : 'back/' ) + filename + '.jpg', {
+							format:  'jpeg',
+							quality: '100'
+						});
+						wrapUp();
+					}, 2000);
+				}
+			} else {
+				wrapUp();
 			}
 		}
 	};
 
 	var timer = setTimeout(function () {
-		console.log('TIMED OUT, closing page immaturely');
-		onPageLoad();
+		console.log('--* This page is taking too much time!');
+		onPageLoad(null, true);
 	}, 120000);
 
 	if ( postData ) {
