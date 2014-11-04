@@ -1,0 +1,104 @@
+#!/bin/bash
+
+echo "* Site URL detected as $SITEURL" | tee $TEMPLOGFILE
+echo "* Site Root detected as $SITEROOT" | tee $TEMPLOGFILE
+echo "* WP_CONTENT detected as $WP_CONTENT_DIR" | tee $TEMPLOGFILE
+echo "* Writing log file to $TEMPLOGFILE" | tee $TEMPLOGFILE
+
+# Backup DB
+if [ ! -z $BACKUPDB ]; then
+	echo "* Exporting DB"
+	wp db export $TMP/backup.sql
+fi;
+
+# User name/pass
+IFS=":" read -a USERPASS <<< $USERPASS;
+WPUSER=${USERPASS[0]}
+WPPASS=${USERPASS[1]}
+
+# Secure a new admin user so we can
+DELETEWPUSER=0
+if [ -z $WPPASS ]; then
+	WPPASS=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 32 | xargs`
+	echo "* Creating new user, username: $WPUSER , password: $WPPASS"
+	if (( "$WPUSER"=="wpupgrade" )); then
+		wp user delete wpupgrade --yes 2>/dev/null
+	fi
+	wp user create $WPUSER $WPUSER@$SITEDOMAIN --role=administrator --user_pass=$WPPASS 2>/dev/null
+	DELETEWPUSER=1
+fi
+
+if [[ $DOSTEPS -ne 2 ]] ; then
+	# Add our mu-plugin to collect error logs
+	sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before/php.log|" $SCRIPTPATH/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+
+	# Traverse the site homepage, and all links within
+	echo "* Collecting PHP/JS errors from site/backend pages"
+	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/before/shots/" $DOENV "$WPUSER" "WPPASS" | tee -a $TMP/before/phantom.log
+fi
+
+# UPGRADE ROUTING
+# ---------------
+
+if [[ $DOSTEPS -gt 1 ]] && [[ $DOSTEPS -ne 4 ]]; then
+	echo "* Updating WordPress"
+	wp core update --version=3.9.2
+	wp core update-db
+
+	echo "* Getting list of plugins with available updates"
+	wp plugin update --all --dry-run 2>/dev/null # so we have update availability information
+	PLUGINS=$( wp plugin list --fields=name --format=csv --status=active --update=available 2>/dev/null | sed 1d )
+	# Exclude some plugins from being updated
+	EXCLUDED=(brightcove-video-cloud wp-polls wp-pro-quiz)
+	for EXCL in ${EXCLUDED[@]}; do PLUGINS=(${PLUGINS[@]/$EXCL}); done # this will match against names that end with EXCL (the % part )
+
+	printf "*- %s\n" ${PLUGINS[@]}
+
+	echo "* Updating plugins"
+	for plugin in ${PLUGINS[@]}; do
+		if [ -a "$WP_CONTENT_DIR/plugins/$plugin/.git" ]; then
+			echo "** Ignoring $plugin since it is a submodule"
+		else
+			echo "** Updating $plugin"
+			wp plugin update $plugin
+		fi
+	done
+
+	# Flushing cache
+	wp cache flush 2>/dev/null
+	sudo service memcached restart
+else
+	echo "* Skipped traversing backend"
+fi
+
+if [[ $DOSTEPS -gt 1 ]]; then
+	# Add our mu-plugin to collect error logs
+	sed "s|TEMP_DIR_PLACEHOLDER|$TMP/after/php.log|" $SCRIPTPATH/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+
+	# Traverse the site homepage, and all links within
+	echo "* Collecting PHP/JS errors from site/backend pages"
+	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/after/shots/" $DOENV "$WPUSER" "WPPASS" | tee -a $TMP/after/phantom.log
+fi
+
+echo "* Removing the mu-plugin"
+rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
+
+# Delete the user we created, if we did create it
+if [ ! -z $DELETEWPUSER ]; then
+	wp user delete $WPUSER --yes
+fi
+
+# Comparing logs folders, if not doing a single step
+if [ $DOSTEPS -ne 2 ] && [ $DOSTEPS -ne 4 ]; then
+	LOG_DIFF="$( diff -rq $TMP/before $TMP/after )"
+	if [ -z "$LOG_DIFF" ]; then
+		echo 'Identical log entries found, upgrade was successful.'
+		exit 0
+	else
+	#	git checkout -f
+	#	git checkout master
+		echo 'Different log entries detected, upgrade needs manual handling.'
+		echo $LOG_DIFF
+		exit 1
+	fi
+fi

@@ -1,7 +1,7 @@
 /*global phantom*/
 phantom.injectJs('helper.js');
 
-var page, startURL, shotsDir, user, pass, url2png, isFrontEnd = true, takeShots = true;
+var page, startURL, shotsDir, user, pass, url2png, isFrontEnd = true, takeShots, doEnv;
 
 if ( system.args.length === 1 ) {
 	console.log('Usage: request.js shots-directory <some URL> user pass');
@@ -9,11 +9,13 @@ if ( system.args.length === 1 ) {
 }
 
 startURL = system.args[1];
-shotsDir = system.args[2];
+takeShots = system.args[2];
+shotsDir = system.args[3];
+doEnv = system.args[4];
 
 if ( system.args.length === 5 ) {
-	user = system.args[3];
-	pass = system.args[4];
+	user = system.args[5];
+	pass = system.args[6];
 }
 
 try {
@@ -90,11 +92,16 @@ var steps = {
 	}
 };
 
-async.series([
-	steps.front,
-	steps.traverse,
-	steps.back,
-	steps.traverse,
-	steps.exit
-]);
+var executeSteps = [];
+if ( doEnv != 2 ) {
+	executeSteps.push(steps.front);
+	executeSteps.push(steps.traverse);
+}
+if ( doEnv > 1 ) {
+	executeSteps.push(steps.back);
+	executeSteps.push(steps.traverse);
+}
+executeSteps.push(steps.exit);
+
+async.series(executeSteps);
 
