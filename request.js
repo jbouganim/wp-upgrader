@@ -13,7 +13,7 @@ takeShots = system.args[2];
 shotsDir = system.args[3];
 doEnv = system.args[4];
 
-if ( system.args.length === 5 ) {
+if ( system.args.length > 4 ) {
 	user = system.args[5];
 	pass = system.args[6];
 }

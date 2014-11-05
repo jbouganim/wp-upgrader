@@ -24,7 +24,7 @@ if [ -z $WPPASS ]; then
 	if (( "$WPUSER"=="wpupgrade" )); then
 		wp user delete wpupgrade --yes 2>/dev/null
 	fi
-	wp user create $WPUSER $WPUSER@$SITEDOMAIN --role=administrator --user_pass=$WPPASS 2>/dev/null
+	wp user create "$WPUSER" "$WPUSER@$SITEDOMAIN" --role=administrator --user_pass="$WPPASS" 2>/dev/null
 	DELETEWPUSER=1
 fi
 
@@ -34,7 +34,7 @@ if [[ $DOSTEPS -ne 2 ]] ; then
 
 	# Traverse the site homepage, and all links within
 	echo "* Collecting PHP/JS errors from site/backend pages"
-	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/before/shots/" $DOENV "$WPUSER" "WPPASS" | tee -a $TMP/before/phantom.log
+	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/before/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/before/phantom.log
 fi
 
 # UPGRADE ROUTING
@@ -77,7 +77,7 @@ if [[ $DOSTEPS -gt 1 ]]; then
 
 	# Traverse the site homepage, and all links within
 	echo "* Collecting PHP/JS errors from site/backend pages"
-	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/after/shots/" $DOENV "$WPUSER" "WPPASS" | tee -a $TMP/after/phantom.log
+	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/after/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/after/phantom.log
 fi
 
 echo "* Removing the mu-plugin"
@@ -85,7 +85,7 @@ rm -f $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
 
 # Delete the user we created, if we did create it
 if [ ! -z $DELETEWPUSER ]; then
-	wp user delete $WPUSER --yes
+	wp user delete "$WPUSER" --yes
 fi
 
 # Comparing logs folders, if not doing a single step
