@@ -129,6 +129,9 @@ function loadPage(url, callback, existingPage, postData) {
 			wrapUp();
 		} else {
 			console.log('-- Loaded ' + url);
+			// Rendering pages shouldn't be count as a timeout
+			clearTimeout(timer);
+			skipTimer = true;
 
 			if ( takeShots ) {
 				if ( url2png.hasOwnProperty('apiKey') && !/wp-admin/.test(url) ) {
