@@ -9,9 +9,9 @@ if ( system.args.length === 1 ) {
 }
 
 startURL = system.args[1];
-takeShots = system.args[2];
+takeShots = system.args[2] * 1;
 shotsDir = system.args[3];
-doEnv = system.args[4];
+doEnv = system.args[4] * 1;
 
 if ( system.args.length > 4 ) {
 	user = system.args[5];
