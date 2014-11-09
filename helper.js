@@ -208,7 +208,39 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 		}
 	};
 
+	// Remove the trailing # off urls
+	urls = _.map(urls, function(url){
+		return url.replace(/#$/, '');
+	});
+
 	urls = _.unique(urls);
+
+	// Filter urls to allow only one url per regex
+	var schemeFound = false,
+		permalink,
+		permalinks = {
+			author: /\/author\//,
+			category: /\/category\//
+			tag: /\/tag\//
+		};
+
+	_.each(permalinks, function(permalink){
+		schemeFound = false;
+		urls = _.filter(urls, function(url){
+			if ( ! permalink.test( url ) ) {
+				return true;
+			}
+
+			if ( ! schemeFound ) {
+				// Allow the first entry only
+				schemeFound = true;
+				return true;
+			} else {
+				// Reject any subsequent matches
+				return false;
+			}
+		});
+	});
 
 	console.log('-- Hitting ' + urls.length + ' URLs queue');
 	console.log(' -* ' + urls.join("\n -* "));
