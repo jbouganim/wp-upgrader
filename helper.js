@@ -96,10 +96,6 @@ function getNewPage() {
 	// Timeout
 	page.settings.resourceTimeout = 30000; // 30 seconds
 	page.settings.loadImages = false;
-	page.settings.localToRemoteUrlAccessEnabled = true;
-	page.settings.ignoreSslErrors = true;
-	page.settings.webSecurityEnabled = false;
-	page.settings.sslProtocol = 'tlsv1';
 
 	//page.onLoadStarted = onLoadStartedApplyTimeout;
 

@@ -1,0 +1,8 @@
+{
+	"resourceTimeout": 30000, // 30 seconds
+	"autoLoadImages": false,
+	"localToRemoteUrlAccessEnabled": true,
+	"ignoreSslErrors": true,
+	"webSecurityEnabled": false,
+	"sslProtocol": "tlsv1"
+}
