@@ -34,7 +34,7 @@ if [[ $DOSTEPS -ne 2 ]] ; then
 
 	# Traverse the site homepage, and all links within
 	echo "* Collecting PHP/JS errors from site/backend pages"
-	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/before/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/before/phantom.log
+	retry_command phantomjs --config="$SCRIPTPATH/config.json" $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/before/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/before/phantom.log
 fi
 
 # UPGRADE ROUTING
@@ -77,7 +77,7 @@ if [[ $DOSTEPS -gt 1 ]]; then
 
 	# Traverse the site homepage, and all links within
 	echo "* Collecting PHP/JS errors from site/backend pages"
-	retry_command phantomjs $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/after/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/after/phantom.log
+	retry_command phantomjs --config="$SCRIPTPATH/config.json" $SCRIPTPATH/request.js "$SITEURL/" $TAKESHOTS "$TMP/after/shots/" $DOENV "$WPUSER" "$WPPASS" | tee -a $TMP/after/phantom.log
 fi
 
 echo "* Removing the mu-plugin"
