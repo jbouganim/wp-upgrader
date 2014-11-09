@@ -220,7 +220,7 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 		permalink,
 		permalinks = {
 			author: /\/author\//,
-			category: /\/category\//
+			category: /\/category\//,
 			tag: /\/tag\//
 		};
 
