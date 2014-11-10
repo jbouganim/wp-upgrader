@@ -216,16 +216,14 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 	urls = _.unique(urls);
 
 	// Filter urls to allow only one url per regex
-	var schemeFound = false,
-		permalink,
-		permalinks = {
+	var permalinks = {
 			author: /\/author\//,
 			category: /\/category\//,
 			tag: /\/tag\//
 		};
 
 	_.each(permalinks, function(permalink){
-		schemeFound = false;
+		var schemeFound = false;
 		urls = _.filter(urls, function(url){
 			if ( ! permalink.test( url ) ) {
 				return true;
