@@ -28,6 +28,8 @@ if [ -z $WPPASS ]; then
 	DELETEWPUSER=1
 fi
 
+[ -d $WP_CONTENT_DIR/mu-plugins ] || mkdir $WP_CONTENT_DIR/mu-plugins;
+
 if [[ $DOSTEPS -ne 2 ]] ; then
 	# Add our mu-plugin to collect error logs
 	sed "s|TEMP_DIR_PLACEHOLDER|$TMP/before/php.log|" $SCRIPTPATH/mu-plugins/php_error_log_handle.php > $WP_CONTENT_DIR/mu-plugins/xt_php_error_log_handle.php
