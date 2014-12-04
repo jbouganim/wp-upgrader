@@ -210,7 +210,7 @@ function traverseURLs(urls, pageCompleteCallback, traverseCompleteCallback) {
 
 	// Remove the trailing # off urls
 	urls = _.map(urls, function(url){
-		return url.replace(/#$/, '');
+		return url.replace(/#.*$/, '');
 	});
 
 	urls = _.unique(urls);
