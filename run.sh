@@ -116,7 +116,7 @@ SCRIPTPATH="`dirname $SCRIPT`"
 # Navigate to site root
 cd "$SITEROOT"
 # Check if WordPress is actually installed in this directory
-wp core is-installed 2>/dev/null
+wp core is-installed --url="$URL" 2>/dev/null
 if [[ $? -ne 0 ]]; then echo 'This is not a valid WordPress install, aborting.' >&2; exit 1; fi;
 
 # Run pre-test script
