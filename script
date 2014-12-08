@@ -44,7 +44,7 @@ fi
 
 if [[ $DOSTEPS -gt 1 ]] && [[ $DOSTEPS -ne 4 ]]; then
 	echo "* Updating WordPress"
-	wp core update --version=3.9.2
+	wp core update --version=3.9.3
 	wp core update-db
 
 	echo "* Getting list of plugins with available updates"
