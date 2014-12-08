@@ -25,6 +25,7 @@ if [ -z $WPPASS ]; then
 		wp user delete wpupgrade --yes 2>/dev/null
 	fi
 	wp user create "$WPUSER" "$WPUSER@$SITEDOMAIN" --role=administrator --user_pass="$WPPASS" 2>/dev/null
+	wp user set-role "$WPUSER" administrator 2>/dev/null
 	DELETEWPUSER=1
 fi
 
