@@ -24,7 +24,8 @@ OPTIONS:
    -E      Test status 1: Before upgrade, 2: After upgrade, 3: Both ( default ), 4: After ( But do not upgrade )
    -c      Take screenshots of pages
    -l      Use less in follow mode to track progress ( so you can scroll )
-   -u      User:Pass to login with, defaults to wpupgrade:{dynamic-pass}
+   -a      User:Pass to login with, defaults to wpupgrade:{dynamic-pass}
+   -u      URL of the multisite installation to target with wp-cli
 EOF
 }
 
@@ -51,8 +52,9 @@ DOSTEPS=3
 LESSF=
 USERPASS=wpupgrade:
 TAKESHOTS=0
+URL=
 
-while getopts "hs:S:br:t:zZ:e:E:clu:" OPTION
+while getopts "hs:S:br:t:zZ:e:E:cla:u:" OPTION
 do
      case $OPTION in
          h)
@@ -93,8 +95,11 @@ do
          l)
              LESSF=1
              ;;
-         u)
+         a)
              USERPASS=$OPTARG
+             ;;
+         u)
+             URL=$OPTARG
              ;;
          ?)
              usage
@@ -120,7 +125,12 @@ if [ ! -z "$PRESCRIPT" ]; then
 fi
 
 # Extract site info using wp-cli
-SITEURL=`wp option get siteurl --url="/" 2> /dev/null`
+if [ -z "$URL" ]; then
+	SITEURL=`wp option get siteurl --url="/" 2> /dev/null`
+else
+	SITEURL="$URL"
+fi
+
 alias wp="wp --url=\"$SITEURL\"" # To populate REQUEST_URI
 SITEROOT=`wp eval 'echo realpath(ABSPATH);' 2> /dev/null`
 WP_CONTENT_DIR=`wp eval 'echo WP_CONTENT_DIR;' 2> /dev/null`
