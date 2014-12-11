@@ -22,10 +22,9 @@ if [ -z $WPPASS ]; then
 	WPPASS=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 32 | xargs`
 	echo "* Creating new user, username: $WPUSER , password: $WPPASS"
 	if (( "$WPUSER"=="wpupgrade" )); then
-		wp user delete wpupgrade --yes 2>/dev/null
+		wp user delete wpupgrade --yes --network 2>/dev/null
 	fi
 	wp user create "$WPUSER" "$WPUSER@$SITEDOMAIN" --role=administrator --user_pass="$WPPASS" 2>/dev/null
-	wp user set-role "$WPUSER" administrator 2>/dev/null
 	DELETEWPUSER=1
 fi
 
